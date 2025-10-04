@@ -66,37 +66,49 @@
   cursor: pointer;
 }
 
-.slider::-webkit-slider-track {
+.slider-enhanced {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-track,
+.slider-enhanced::-webkit-slider-track {
   background: #e5e7eb;
   height: 8px;
   border-radius: 4px;
 }
 
-.slider::-webkit-slider-thumb {
+.slider::-webkit-slider-thumb,
+.slider-enhanced::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  background: #3b82f6;
-  height: 20px;
-  width: 20px;
+  background: #000000;
+  height: 12px;
+  width: 12px;
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.slider::-webkit-slider-thumb:hover {
-  background: #2563eb;
+.slider::-webkit-slider-thumb:hover,
+.slider-enhanced::-webkit-slider-thumb:hover {
+  background: #333333;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.slider::-moz-range-track {
+.slider::-moz-range-track,
+.slider-enhanced::-moz-range-track {
   background: #e5e7eb;
   height: 8px;
   border-radius: 4px;
   border: none;
 }
 
-.slider::-moz-range-thumb {
-  background: #3b82f6;
+.slider::-moz-range-thumb,
+.slider-enhanced::-moz-range-thumb {
+  background: #000000;
   height: 20px;
   width: 20px;
   border-radius: 50%;
@@ -105,8 +117,9 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.slider::-moz-range-thumb:hover {
-  background: #2563eb;
+.slider::-moz-range-thumb:hover,
+.slider-enhanced::-moz-range-thumb:hover {
+  background: #333333;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 

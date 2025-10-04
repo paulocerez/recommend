@@ -11,12 +11,12 @@ interface SeasonalAdjustmentProps {
   onToggleSeasonalAdjustment: (enabled: boolean) => void;
 }
 
-const SeasonalAdjustment: React.FC<SeasonalAdjustmentProps> = ({
+export default function SeasonalAdjustment({
   currentSeason,
   onSeasonChange,
   seasonalAdjustmentEnabled,
   onToggleSeasonalAdjustment
-}) => {
+}: SeasonalAdjustmentProps) {
   const seasons = [
     { key: 'spring', label: 'Spring', icon: <Leaf className="h-4 w-4" />, color: 'text-green-500' },
     { key: 'summer', label: 'Summer', icon: <Sun className="h-4 w-4" />, color: 'text-yellow-500' },
@@ -72,4 +72,3 @@ const SeasonalAdjustment: React.FC<SeasonalAdjustmentProps> = ({
   );
 };
 
-export default SeasonalAdjustment;

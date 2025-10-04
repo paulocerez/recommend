@@ -4,7 +4,7 @@ interface BannerProps {
   message: string;
 }
 
-const Banner: React.FC<BannerProps> = ({ message }) => {
+export default function Banner({ message }: BannerProps) {
   return (
     <div className="flex justify-center w-full py-4">
       <div className="border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -16,6 +16,4 @@ const Banner: React.FC<BannerProps> = ({ message }) => {
       </div>
     </div>
   );
-};
-
-export default Banner;
+}

@@ -1,25 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserPreferences, AlgorithmWeights, RecommendationExplanation, TravelProfile } from '../types';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
-import { Slider } from './ui/Slider';
-import { Progress } from './ui/Progress';
 import { Button } from './ui/Button';
 import { 
-  Settings, 
-  Users, 
-  TrendingUp, 
   Shuffle, 
-  AlertTriangle,
-  Sun,
-  Snowflake,
-  Leaf,
-  Flame,
-  Mountain,
-  DollarSign,
-  Activity,
-  Heart,
-  MapPin,
-  Calendar
+  Settings,
 } from 'lucide-react';
 
 interface AlgorithmPanelProps {
@@ -27,320 +11,135 @@ interface AlgorithmPanelProps {
   algorithmWeights: AlgorithmWeights;
   travelProfile: TravelProfile;
   explanation: RecommendationExplanation;
+  hasCompletedOnboarding: boolean;
   onPreferencesChange: (preferences: Partial<UserPreferences>) => void;
   onWeightsChange: (weights: Partial<AlgorithmWeights>) => void;
   onResetProfile: () => void;
+  onOpenParameters: () => void;
 }
 
-const AlgorithmPanel: React.FC<AlgorithmPanelProps> = ({
-  userPreferences,
-  algorithmWeights,
-  travelProfile,
-  explanation,
-  onPreferencesChange,
-  onWeightsChange,
-  onResetProfile
-}) => {
-  const getClimateIcon = (climate: string) => {
-    const icons = {
-      tropical: <Sun className="h-4 w-4 text-yellow-500" />,
-      temperate: <Leaf className="h-4 w-4 text-green-500" />,
-      cold: <Snowflake className="h-4 w-4 text-blue-500" />,
-      arid: <Flame className="h-4 w-4 text-orange-500" />,
-      continental: <Mountain className="h-4 w-4 text-gray-500" />
-    };
-    return icons[climate as keyof typeof icons] || <Sun className="h-4 w-4" />;
-  };
+interface Update {
+  id: string;
+  type: 'main' | 'secondary' | 'context';
+  content: string;
+  timestamp: Date;
+  icon?: React.ReactNode;
+}
 
-  const getActivityIcon = (activity: string) => {
-    const icons = {
-      adventure: <Mountain className="h-4 w-4 text-red-500" />,
-      culture: <Heart className="h-4 w-4 text-purple-500" />,
-      relaxation: <Sun className="h-4 w-4 text-green-500" />,
-      nightlife: <Activity className="h-4 w-4 text-pink-500" />,
-      nature: <Leaf className="h-4 w-4 text-emerald-500" />,
-      history: <MapPin className="h-4 w-4 text-amber-500" />
-    };
-    return icons[activity as keyof typeof icons] || <Activity className="h-4 w-4" />;
+export default function AlgorithmPanel({
+  explanation,
+  hasCompletedOnboarding,
+  onResetProfile,
+  onOpenParameters
+}: AlgorithmPanelProps) {
+  const [updates, setUpdates] = useState<Update[]>([]);
+
+  // Generate updates from explanation only after onboarding is completed
+  useEffect(() => {
+    if (!hasCompletedOnboarding) {
+      setUpdates([]);
+      return;
+    }
+
+    const newUpdates: Update[] = [
+      {
+        id: 'main',
+        type: 'main',
+        content: explanation.mainReason,
+        timestamp: new Date(),
+      },
+      ...explanation.secondaryReasons.map((reason, index) => ({
+        id: `secondary-${index}`,
+        type: 'secondary' as const,
+        content: reason,
+        timestamp: new Date(Date.now() - (index + 1) * 30000), // 30 seconds apart
+      })),
+      {
+        id: 'similar-users',
+        type: 'context' as const,
+        content: `Similar travelers: ${explanation.similarUsers.join(', ')}`,
+        timestamp: new Date(Date.now() - 120000), // 2 minutes ago
+      },
+      {
+        id: 'seasonal',
+        type: 'context' as const,
+        content: explanation.seasonalAdjustment,
+        timestamp: new Date(Date.now() - 150000), // 2.5 minutes ago
+      },
+      {
+        id: 'budget',
+        type: 'context' as const,
+        content: explanation.budgetImpact,
+        timestamp: new Date(Date.now() - 180000), // 3 minutes ago
+      }
+    ];
+    
+    setUpdates(newUpdates);
+  }, [explanation, hasCompletedOnboarding]);
+
+  const formatTime = (timestamp: Date) => {
+    const now = new Date();
+    const diff = now.getTime() - timestamp.getTime();
+    const minutes = Math.floor(diff / 60000);
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes === 1) return '1 minute ago';
+    if (minutes < 60) return `${minutes} minutes ago`;
+    
+    const hours = Math.floor(minutes / 60);
+    if (hours === 1) return '1 hour ago';
+    return `${hours} hours ago`;
   };
 
   return (
-    <div className="space-y-6 algorithm-panel">
-      {/* Algorithm Weights */}
-      <Card className="card-hover">
-        <CardHeader>
-          <CardTitle className="flex items-center text-lg">
-            <Settings className="h-5 w-5 mr-2" />
-            Algorithm Weights
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <div className="flex justify-between text-sm mb-2">
-              <span>Content-Based</span>
-              <span>{Math.round(algorithmWeights.contentBased * 100)}%</span>
-            </div>
-            <Slider
-              value={algorithmWeights.contentBased}
-              onValueChange={(value) => onWeightsChange({ contentBased: value })}
-              min={0}
-              max={1}
-              step={0.1}
-            />
-          </div>
-          <div>
-            <div className="flex justify-between text-sm mb-2">
-              <span>Collaborative</span>
-              <span>{Math.round(algorithmWeights.collaborative * 100)}%</span>
-            </div>
-            <Slider
-              value={algorithmWeights.collaborative}
-              onValueChange={(value) => onWeightsChange({ collaborative: value })}
-              min={0}
-              max={1}
-              step={0.1}
-            />
-          </div>
-          <div>
-            <div className="flex justify-between text-sm mb-2">
-              <span>Popularity</span>
-              <span>{Math.round(algorithmWeights.popularity * 100)}%</span>
-            </div>
-            <Slider
-              value={algorithmWeights.popularity}
-              onValueChange={(value) => onWeightsChange({ popularity: value })}
-              min={0}
-              max={1}
-              step={0.1}
-            />
-          </div>
-          <div>
-            <div className="flex justify-between text-sm mb-2">
-              <span>Diversity</span>
-              <span>{Math.round(algorithmWeights.diversity * 100)}%</span>
-            </div>
-            <Slider
-              value={algorithmWeights.diversity}
-              onValueChange={(value) => onWeightsChange({ diversity: value })}
-              min={0}
-              max={1}
-              step={0.1}
-            />
-          </div>
-        </CardContent>
-      </Card>
+    <div className="bg-white border border-gray-100 shadow-md rounded-lg p-4 space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-sm font-medium text-gray-900">Recommendation Reasoning</span>
+        </div>
+      </div>
 
-      {/* Climate Preferences */}
-      <Card className="card-hover">
-        <CardHeader>
-          <CardTitle className="text-lg">Climate Preferences</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {Object.entries(userPreferences.climate).map(([climate, value]) => (
-            <div key={climate}>
-              <div className="flex items-center justify-between text-sm mb-2">
-                <div className="flex items-center">
-                  {getClimateIcon(climate)}
-                  <span className="ml-2 capitalize">{climate}</span>
-                </div>
-                <span>{Math.round(value * 100)}%</span>
-              </div>
-              <Slider
-                value={value}
-                onValueChange={(newValue) => 
-                  onPreferencesChange({
-                    climate: { ...userPreferences.climate, [climate]: newValue }
-                  })
-                }
-                min={0}
-                max={1}
-                step={0.1}
-              />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Budget Preferences */}
-      <Card className="card-hover">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center">
-            <DollarSign className="h-5 w-5 mr-2" />
-            Budget Level
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {Object.entries(userPreferences.budget).map(([budget, value]) => (
-            <div key={budget}>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="capitalize">{budget}</span>
-                <span>{Math.round(value * 100)}%</span>
-              </div>
-              <Slider
-                value={value}
-                onValueChange={(newValue) => 
-                  onPreferencesChange({
-                    budget: { ...userPreferences.budget, [budget]: newValue }
-                  })
-                }
-                min={0}
-                max={1}
-                step={0.1}
-              />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Activity Preferences */}
-      <Card className="card-hover">
-        <CardHeader>
-          <CardTitle className="text-lg">Activity Types</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {Object.entries(userPreferences.activities).map(([activity, value]) => (
-            <div key={activity}>
-              <div className="flex items-center justify-between text-sm mb-2">
-                <div className="flex items-center">
-                  {getActivityIcon(activity)}
-                  <span className="ml-2 capitalize">{activity}</span>
-                </div>
-                <span>{Math.round(value * 100)}%</span>
-              </div>
-              <Slider
-                value={value}
-                onValueChange={(newValue) => 
-                  onPreferencesChange({
-                    activities: { ...userPreferences.activities, [activity]: newValue }
-                  })
-                }
-                min={0}
-                max={1}
-                step={0.1}
-              />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Live Explanation */}
-      <Card className="card-hover">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center">
-            <TrendingUp className="h-5 w-5 mr-2" />
-            Live Explanation
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm font-medium text-blue-900">
-                {explanation.mainReason}
-              </p>
-            </div>
-            <div className="space-y-2">
-              {explanation.secondaryReasons.map((reason, index) => (
-                <div key={index} className="text-sm text-muted-foreground">
-                  • {reason}
-                </div>
-              ))}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              <strong>Similar travelers:</strong> {explanation.similarUsers.join(', ')}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              <strong>Seasonal adjustment:</strong> {explanation.seasonalAdjustment}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              <strong>Budget impact:</strong> {explanation.budgetImpact}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Travel Profile */}
-      <Card className="card-hover">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center">
-            <Users className="h-5 w-5 mr-2" />
-            Your Travel Profile
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div>
-              <h4 className="font-medium text-sm mb-2">Learned Preferences</h4>
-              <div className="flex flex-wrap gap-2">
-                {travelProfile.learnedPreferences.map((pref, index) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
-                  >
-                    {pref}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h4 className="font-medium text-sm mb-2">Travel History</h4>
-              <div className="flex flex-wrap gap-2">
-                {travelProfile.travelHistory.map((destination, index) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 bg-secondary text-secondary-foreground text-xs rounded-full"
-                  >
-                    {destination}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4 mr-1" />
-              Current season: {travelProfile.currentSeason}
-            </div>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <DollarSign className="h-4 w-4 mr-1" />
-              Budget range: ${travelProfile.budgetRange[0]} - ${travelProfile.budgetRange[1]}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Filter Bubble Warning */}
-      {travelProfile.filterBubbleWarning && (
-        <Card className="border-orange-200 bg-orange-50 card-hover">
-          <CardContent className="pt-6">
-            <div className="flex items-start">
-              <AlertTriangle className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-              <div>
-                <h4 className="font-medium text-orange-900">Filter Bubble Warning</h4>
-                <p className="text-sm text-orange-700 mt-1">
-                  Your recommendations are getting narrow. Try exploring new types of destinations!
+      {/* Updates feed */}
+      <div className="max-h-[60vh] overflow-y-auto space-y-1">
+        {updates.map((update, index) => (
+          <div key={update.id} className="py-2">
+            <div className="flex items-start space-x-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {update.content}
                 </p>
+                <div className="flex items-center mt-1">
+                  <span className="text-xs text-gray-400">
+                    {formatTime(update.timestamp)}
+                  </span>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        ))}
+      </div>
 
-      {/* Reset Profile */}
-      <Card className="card-hover">
-        <CardContent className="pt-6">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={onResetProfile}
-          >
-            <Shuffle className="h-4 w-4 mr-2" />
-            Reset My Profile
-          </Button>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            Demonstrates the cold-start problem
-          </p>
-        </CardContent>
-      </Card>
+
+      <div className="grid grid-cols-2 gap-2">
+        <Button
+          variant="outline"
+          className="w-full bg-white hover:bg-gray-50 border-gray-200 text-gray-700 text-sm"
+          onClick={onOpenParameters}
+        >
+          Adjust Parameters
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full bg-white hover:bg-gray-50 border-gray-200 text-gray-700 text-sm"
+          onClick={onResetProfile}
+        >
+          Onboarding
+        </Button>
+      </div>
     </div>
   );
 };
 
-export default AlgorithmPanel;
