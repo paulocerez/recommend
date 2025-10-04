@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { UserPreferences, AlgorithmWeights, RecommendationExplanation, TravelProfile } from '../types';
 import { Button } from './ui/Button';
-import { 
-  Shuffle, 
-  Settings,
-} from 'lucide-react';
 
-interface AlgorithmPanelProps {
+interface ReasoningPanelProps {
   userPreferences: UserPreferences;
   algorithmWeights: AlgorithmWeights;
   travelProfile: TravelProfile;
@@ -26,15 +22,14 @@ interface Update {
   icon?: React.ReactNode;
 }
 
-export default function AlgorithmPanel({
+export default function ReasoningPanel({
   explanation,
   hasCompletedOnboarding,
   onResetProfile,
   onOpenParameters
-}: AlgorithmPanelProps) {
+}: ReasoningPanelProps) {
   const [updates, setUpdates] = useState<Update[]>([]);
 
-  // Generate updates from explanation only after onboarding is completed
   useEffect(() => {
     if (!hasCompletedOnboarding) {
       setUpdates([]);
@@ -101,6 +96,12 @@ export default function AlgorithmPanel({
         </div>
       </div>
 
+      {updates.length === 0 && (
+        <div className="text-sm text-gray-700 flex items-center space-x-2 animate-pulse">
+          Start the Onboarding to get started ...
+        </div>
+      )}
+
       {/* Updates feed */}
       <div className="max-h-[60vh] overflow-y-auto space-y-1">
         {updates.map((update, index) => (
@@ -133,10 +134,20 @@ export default function AlgorithmPanel({
         
         <Button
           variant="outline"
-          className="w-full bg-white hover:bg-gray-50 border-gray-200 text-gray-700 text-sm"
+          className={`w-full bg-white hover:bg-gray-50 border-gray-200 text-gray-700 text-sm ${
+            updates.length === 0 
+              ? 'animate-bounce border-green-400 bg-green-100 text-green-800 hover:bg-green-200 ring-1 ring-green-200' 
+              : ''
+          }`}
           onClick={onResetProfile}
         >
-          Onboarding
+          {updates.length === 0 ? (
+            <div className="flex items-center space-x-2">
+              <span className="font-semibold">Start Onboarding</span>
+            </div>
+          ) : (
+            'Onboarding'
+          )}
         </Button>
       </div>
     </div>

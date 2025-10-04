@@ -4,7 +4,7 @@ import { mockDestinations, defaultUserPreferences, defaultAlgorithmWeights, defa
 import { RecommendationEngine } from '../utils/recommendationEngine';
 import DestinationCard from './DestinationCard';
 import DestinationDialog from './DestinationDialog';
-import AlgorithmPanel from './AlgorithmPanel';
+import AlgorithmPanel from './ReasoningPanel';
 import Banner from './Banner';
 import ParametersModal from './ParametersModal';
 import OnboardingDialog from './OnboardingDialog';
@@ -18,14 +18,14 @@ import {
   Menu,
   X
 } from 'lucide-react';
+import ReasoningPanel from './ReasoningPanel';
 
 export default function HomePage() {
   const [destinations, setDestinations] = useState<Destination[]>(mockDestinations);
   const [userPreferences, setUserPreferences] = useState<UserPreferences>(defaultUserPreferences);
   const [algorithmWeights, setAlgorithmWeights] = useState<AlgorithmWeights>(defaultAlgorithmWeights);
   const [travelProfile, setTravelProfile] = useState<TravelProfile>(defaultTravelProfile);
-  const [showAlgorithmPanel, setShowAlgorithmPanel] = useState(true);
-  const [isComparisonMode, setIsComparisonMode] = useState(false);
+  const [showReasoningPanel, setShowReasoningPanel] = useState(true);
   const [seasonalAdjustmentEnabled, setSeasonalAdjustmentEnabled] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isParametersModalOpen, setIsParametersModalOpen] = useState(false);
@@ -262,7 +262,7 @@ export default function HomePage() {
         {currentView === 'recommender' ? (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left Column - Destinations */}
-            <div className={`${showAlgorithmPanel ? 'lg:col-span-7' : 'lg:col-span-12'}`}>
+            <div className={`${showReasoningPanel ? 'lg:col-span-7' : 'lg:col-span-12'}`}>
               <div className="mb-12">
                 <h2 className="text-3xl font-medium text-gray-900 mb-2">
                   Destination Ranking
@@ -338,9 +338,9 @@ export default function HomePage() {
             </div>
 
             {/* Right Column - Algorithm Panel */}
-            {showAlgorithmPanel && (
+            {showReasoningPanel && (
               <div className="lg:col-span-5">
-                <AlgorithmPanel
+                <ReasoningPanel
                   userPreferences={userPreferences}
                   algorithmWeights={algorithmWeights}
                   travelProfile={travelProfile}
