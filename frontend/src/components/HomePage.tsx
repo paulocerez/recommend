@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import ReasoningPanel from './ReasoningPanel';
 import TheoryContent from './TheoryContent';
-import { SimpleEditor } from './tiptap-templates/simple/simple-editor';
 
 export default function HomePage() {
   const [destinations, setDestinations] = useState<Destination[]>(mockDestinations);
@@ -34,7 +33,7 @@ export default function HomePage() {
   const [selectedDestination, setSelectedDestination] = useState<Destination | null>(null);
   const [isDestinationDialogOpen, setIsDestinationDialogOpen] = useState(false);
   const [previousRankings, setPreviousRankings] = useState<{ [key: string]: number }>({});
-  const [currentView, setCurrentView] = useState<'recommender' | 'theory' | 'editor'>('recommender');
+  const [currentView, setCurrentView] = useState<'recommender' | 'theory'>('recommender');
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
   // Initialize recommendation engine
@@ -168,16 +167,6 @@ export default function HomePage() {
               }`}
             >
               Theory
-            </button>
-            <button
-              onClick={() => setCurrentView('editor')}
-              className={`font-medium ${
-                currentView === 'editor' 
-                  ? 'text-gray-900 border-b border-gray-900' 
-                  : 'text-gray-700 hover:text-gray-900'
-              }`}
-            >
-              Editor
             </button>
           </div>
         </div>
@@ -365,11 +354,9 @@ export default function HomePage() {
               </div>
             )}
           </div>
-        ) : currentView === 'theory' ? (
+        ) : (
           // Theory Content
           <TheoryContent />
-        ) : (
-          <SimpleEditor />
         )}
 
         {/* Filter Bubble Warning - Only show in recommender view */}

@@ -1,0 +1,35 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 2
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "How does the algorithm work?"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "The algorithm is a combination of content-based filtering, collaborative filtering, popularity, and diversity."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Recommender systems are algorithms providing personalized suggestions for items that are most relevant to each user."
+        }
+      ]
+    }
+  ]
+}
