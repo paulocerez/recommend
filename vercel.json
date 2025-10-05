@@ -8,11 +8,5 @@
         "distDir": "build"
       }
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "frontend/$1"
-    }
   ]
 }
